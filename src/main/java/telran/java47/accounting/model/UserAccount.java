@@ -1,5 +1,6 @@
 package telran.java47.accounting.model;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -18,6 +18,8 @@ public class UserAccount {
 	@Setter
 	String password;
 	@Setter
+	LocalDate passwordTime;
+	@Setter
 	String firstName;
 	@Setter
 	String lastName;
@@ -25,6 +27,7 @@ public class UserAccount {
 	
 	public UserAccount() {
 		roles = new HashSet<>();
+		passwordTime =  LocalDate.now().plusDays(60);
 	}
 
 	public UserAccount(String login, String password, String firstName, String lastName) {
