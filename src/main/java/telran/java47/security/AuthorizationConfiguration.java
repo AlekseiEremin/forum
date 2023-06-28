@@ -14,17 +14,17 @@ public class AuthorizationConfiguration {
 	@Bean
 	public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 		http.httpBasic(withDefaults());
-		http.csrf().disable();//отключает 
+		http.csrf().disable();//отключает зашиту подделка межсайтовых запросов (csrf)
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//отмена куков
 		http.authorizeRequests(authrize -> authrize
 				.mvcMatchers("/account/register","/forum/posts/**")
-				    .permitAll()//разреши всем если совмадает то что находится в .mvcMatchers()
+				    .permitAll()//разреши всем если совпадает то что находится в .mvcMatchers()
 				.mvcMatchers("/account/login","/account/user/**","/forum/post/**")
 			   	    .access("@customSecurity.checkPasswordTime(authentication.name)")
 			    .mvcMatchers("/account/user/{login}/role/{role}")
-				     .hasRole("ADMINISTRATOR")//аутефецыровонный и имеет роль 
+				     .hasRole("ADMINISTRATOR")//аутентифицированный и имеет роль
 				.mvcMatchers(HttpMethod.PUT, "/account/user/{login}")
-				     .access("#login == authentication.name")//тут получается если логин равен аутефицыровоному юзеру 
+				     .access("#login == authentication.name")//тут получается если логин равен аутентифицированный юзеру
 				.mvcMatchers(HttpMethod.DELETE, "/account/user/{login}")
 				     .access("#login == authentication.name or hasRole('ADMINISTRATOR')")
 				.mvcMatchers(HttpMethod.POST, "/forum/post/{author}")
@@ -32,11 +32,11 @@ public class AuthorizationConfiguration {
 				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}/comment/{author}")
 				     .access("#author == authentication.name")
 				.mvcMatchers(HttpMethod.PUT, "/forum/post/{id}")
-				     .access("@customSecurity.checkPostAuthor(#id,authentication.name)")//@ через это обращыемся к классу
+				     .access("@customSecurity.checkPostAuthor(#id,authentication.name)")//@ через это обращаемся к классу
 				.mvcMatchers(HttpMethod.DELETE, "/forum/post/{id}")
 				     .access("@customSecurity.checkPostAuthor(#id,authentication.name) or hasRole('MODERATOR')")
 				.anyRequest()
-				    .authenticated()//сейчас все запросы требуют ауторизацыю 
+				    .authenticated()//сейчас все запросы требуют авторизацию
 		);
 
 		return http.build();
